@@ -39,6 +39,7 @@ import {
   getRestBadge,
 } from "@/lib/fatigueUtils";
 import { BlowoutBar } from "@/components/BlowoutBar";
+import { ShootingBattleCard } from "@/components/ShootingBattleCard";
 
 interface MatchPredictionModalProps {
   open: boolean;
