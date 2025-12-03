@@ -184,9 +184,11 @@ export interface PlayerFullPrediction {
     defensive_rating?: number;
     rank?: number;
     description?: string;
+    factor_applied?: number;
   };
   context?: PlayerContext;
   blowout_analysis: BlowoutAnalysis;
+  is_home?: boolean;
 }
 
 export interface MatchContext {

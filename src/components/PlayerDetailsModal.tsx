@@ -183,113 +183,62 @@ export function PlayerDetailsModal({
             </CardContent>
           </Card>
 
-          {/* PRO CONTEXT: Fatigue & Matchup */}
-          {historyData?.fatigue || historyData?.matchup_context || historyData?.splits ? (
-            <div className="space-y-4 border-t pt-4">
+          {/* Analyse Contextuelle Section */}
+          {(historyData?.fatigue || player.matchup_analysis?.description) && (
+            <div className="space-y-3 border-t pt-4">
               <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
                 <Trophy className="h-4 w-4" />
-                PRO CONTEXT
+                Analyse Contextuelle
               </h3>
 
-              {/* Fatigue & Matchup Banner */}
-              {(historyData?.fatigue || historyData?.matchup_context) && (
-                <div className="space-y-3">
-                  <div className="flex flex-wrap items-center gap-2">
-                    {historyData?.fatigue && (
-                      <>
-                        <Badge
-                          variant={
-                            historyData.fatigue.color_code === "green"
-                              ? "default"
-                              : historyData.fatigue.color_code === "red"
-                                ? "destructive"
-                                : "secondary"
-                          }
-                          className={
-                            historyData.fatigue.color_code === "green"
-                              ? "bg-emerald-500/20 border-emerald-500/30 text-emerald-700 hover:bg-emerald-500/30"
-                              : historyData.fatigue.color_code === "red"
-                                ? "bg-red-500/20 border-red-500/30 text-red-700 hover:bg-red-500/30"
-                                : ""
-                          }
-                        >
-                          {historyData.fatigue.status}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          Last Game: {historyData.fatigue.last_min.toFixed(0)} min
-                        </span>
-                      </>
-                    )}
-                    {historyData?.matchup_context && (
-                      <Badge variant="outline" className="text-xs">
-                        {historyData.matchup_context}
-                      </Badge>
-                    )}
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Fatigue Badge */}
+                {historyData?.fatigue && (
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant={
+                        historyData.fatigue.color_code === "green"
+                          ? "default"
+                          : historyData.fatigue.color_code === "red"
+                            ? "destructive"
+                            : "secondary"
+                      }
+                      className={
+                        historyData.fatigue.color_code === "green"
+                          ? "bg-emerald-500/20 border-emerald-500/30 text-emerald-700 hover:bg-emerald-500/30"
+                          : historyData.fatigue.color_code === "red"
+                            ? "bg-red-500/20 border-red-500/30 text-red-700 hover:bg-red-500/30"
+                            : "bg-gray-500/20 border-gray-500/30 text-gray-700 hover:bg-gray-500/30"
+                      }
+                    >
+                      {historyData.fatigue.status}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground font-medium">
+                      {historyData.fatigue.last_min.toFixed(0)} min
+                      {historyData.fatigue.days_rest > 0 ? ` (${historyData.fatigue.days_rest} day${historyData.fatigue.days_rest !== 1 ? 's' : ''} rest)` : " (back-to-back)"}
+                    </span>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Home/Away Splits Card */}
-              {historyData?.splits && (historyData.splits.home || historyData.splits.away) && (
-                <Card className="bg-muted/40 border-muted/60">
-                  <CardContent className="pt-6">
-                    <div className="space-y-3">
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                        {selectedStat} Comparison: Home vs Away
-                      </p>
-                      <div className="grid grid-cols-2 gap-4">
-                        {/* Home Split */}
-                        {historyData.splits.home && (
-                          <div
-                            className={`p-4 rounded-lg border transition-all ${
-                              isPlayerHome
-                                ? "bg-blue-50/50 border-blue-200 ring-1 ring-blue-200"
-                                : "bg-background border-border"
-                            }`}
-                          >
-                            <p className="text-xs text-muted-foreground font-medium mb-2">
-                              {isPlayerHome ? "🏠 HOME (Your Team)" : "🏠 HOME"}
-                            </p>
-                            <p className="text-2xl font-bold text-primary">
-                              {getSelectedStatValue("home")?.toFixed(1) || "-"}
-                            </p>
-                            {historyData.splits.home.GP && (
-                              <p className="text-xs text-muted-foreground mt-1">
-                                GP: {historyData.splits.home.GP}
-                              </p>
-                            )}
-                          </div>
-                        )}
-
-                        {/* Away Split */}
-                        {historyData.splits.away && (
-                          <div
-                            className={`p-4 rounded-lg border transition-all ${
-                              !isPlayerHome
-                                ? "bg-amber-50/50 border-amber-200 ring-1 ring-amber-200"
-                                : "bg-background border-border"
-                            }`}
-                          >
-                            <p className="text-xs text-muted-foreground font-medium mb-2">
-                              {!isPlayerHome ? "✈️ AWAY (Your Team)" : "✈️ AWAY"}
-                            </p>
-                            <p className="text-2xl font-bold text-primary">
-                              {getSelectedStatValue("away")?.toFixed(1) || "-"}
-                            </p>
-                            {historyData.splits.away.GP && (
-                              <p className="text-xs text-muted-foreground mt-1">
-                                GP: {historyData.splits.away.GP}
-                              </p>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+                {/* Matchup Badge */}
+                {player.matchup_analysis?.description && (
+                  <Badge
+                    variant="outline"
+                    className={
+                      player.matchup_analysis.description.startsWith("🔴")
+                        ? "bg-red-500/20 border-red-500/30 text-red-700 hover:bg-red-500/30"
+                        : player.matchup_analysis.description.startsWith("🟢")
+                          ? "bg-emerald-500/20 border-emerald-500/30 text-emerald-700 hover:bg-emerald-500/30"
+                          : "bg-amber-500/20 border-amber-500/30 text-amber-700 hover:bg-amber-500/30"
+                    }
+                  >
+                    {player.matchup_analysis.description}
+                  </Badge>
+                )}
+              </div>
             </div>
-          ) : null}
+          )}
+
 
           {/* HISTORIQUE */}
           <div>
@@ -310,7 +259,69 @@ export function PlayerDetailsModal({
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                   </div>
                 ) : recentFormAvg ? (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
+                    {/* Home/Away Splits Comparison Card */}
+                    {historyData?.splits && (historyData.splits.home || historyData.splits.away) && (
+                      <Card className="bg-muted/40 border-muted/60">
+                        <CardContent className="pt-6">
+                          <div className="space-y-3">
+                            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                              Domicile vs Extérieur - {selectedStat}
+                            </p>
+                            <div className="grid grid-cols-2 gap-4">
+                              {/* Home Split */}
+                              {historyData.splits.home && (
+                                <div
+                                  className={`p-4 rounded-lg border transition-all ${
+                                    isPlayerHome
+                                      ? "bg-blue-50/50 border-blue-200 ring-1 ring-blue-200"
+                                      : "bg-background border-border"
+                                  }`}
+                                >
+                                  <p className="text-xs text-muted-foreground font-medium mb-2">
+                                    {isPlayerHome ? "🏠 Domicile (Équipe)" : "🏠 Domicile"}
+                                  </p>
+                                  <p className="text-2xl font-bold text-primary">
+                                    {getSelectedStatValue("home")?.toFixed(1) || "-"}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground mt-2">{selectedStat}</p>
+                                  {historyData.splits.home.GP && (
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      {historyData.splits.home.GP} matchs
+                                    </p>
+                                  )}
+                                </div>
+                              )}
+
+                              {/* Away Split */}
+                              {historyData.splits.away && (
+                                <div
+                                  className={`p-4 rounded-lg border transition-all ${
+                                    !isPlayerHome
+                                      ? "bg-amber-50/50 border-amber-200 ring-1 ring-amber-200"
+                                      : "bg-background border-border"
+                                  }`}
+                                >
+                                  <p className="text-xs text-muted-foreground font-medium mb-2">
+                                    {!isPlayerHome ? "✈️ Extérieur (Équipe)" : "✈️ Extérieur"}
+                                  </p>
+                                  <p className="text-2xl font-bold text-primary">
+                                    {getSelectedStatValue("away")?.toFixed(1) || "-"}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground mt-2">{selectedStat}</p>
+                                  {historyData.splits.away.GP && (
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      {historyData.splits.away.GP} matchs
+                                    </p>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+
                     <div className="flex items-center gap-2 mb-2">
                       <CalendarDays className="h-4 w-4 text-blue-500" />
                       <p className="text-sm text-muted-foreground font-medium">
