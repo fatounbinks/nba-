@@ -84,22 +84,22 @@ export function MatchSimulator({
   const isLoading = initialLoading;
 
   const toggleHomePlayerAbsent = useCallback(
-    (playerIndex: number) => {
-      setHomeAbsentIndices((prev) =>
-        prev.includes(playerIndex)
-          ? prev.filter((idx) => idx !== playerIndex)
-          : [...prev, playerIndex]
+    (playerId: number) => {
+      setHomeAbsentPlayerIds((prev) =>
+        prev.includes(playerId)
+          ? prev.filter((id) => id !== playerId)
+          : [...prev, playerId]
       );
     },
     []
   );
 
   const toggleAwayPlayerAbsent = useCallback(
-    (playerIndex: number) => {
-      setAwayAbsentIndices((prev) =>
-        prev.includes(playerIndex)
-          ? prev.filter((idx) => idx !== playerIndex)
-          : [...prev, playerIndex]
+    (playerId: number) => {
+      setAwayAbsentPlayerIds((prev) =>
+        prev.includes(playerId)
+          ? prev.filter((id) => id !== playerId)
+          : [...prev, playerId]
       );
     },
     []
