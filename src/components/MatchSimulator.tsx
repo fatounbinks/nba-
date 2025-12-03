@@ -34,8 +34,8 @@ export function MatchSimulator({
   homeTeamName,
   awayTeamName,
 }: MatchSimulatorProps) {
-  const [homeAbsentIndices, setHomeAbsentIndices] = useState<number[]>([]);
-  const [awayAbsentIndices, setAwayAbsentIndices] = useState<number[]>([]);
+  const [homeAbsentPlayerIds, setHomeAbsentPlayerIds] = useState<number[]>([]);
+  const [awayAbsentPlayerIds, setAwayAbsentPlayerIds] = useState<number[]>([]);
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerFullPrediction | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalTeam, setModalTeam] = useState<"home" | "away">("home");
