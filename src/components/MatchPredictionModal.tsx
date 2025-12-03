@@ -342,9 +342,9 @@ export function MatchPredictionModal({
             )}
 
             {/* SECTION 5B: SHOOTING BATTLE */}
-            {shootingPrediction && (
+            {homeTeamId && awayTeamId && (
               <div className="border-t pt-4">
-                <ShootingBattleCard data={shootingPrediction} />
+                <ShootingBattleCard homeTeamCode={homeTeamId} awayTeamCode={awayTeamId} />
               </div>
             )}
 
