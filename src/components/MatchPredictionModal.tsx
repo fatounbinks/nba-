@@ -327,6 +327,18 @@ export function MatchPredictionModal({
 
             </div>
 
+            {/* SECTION 5: BARRE DE RISQUE DE BLOWOUT */}
+            {game?.homeTeam && game?.awayTeam && (
+              <div className="border-t pt-4">
+                <BlowoutBar
+                  homeTeamName={game.homeTeam}
+                  awayTeamName={game.awayTeam}
+                  absentHomePlayerIds={homeMissingPlayers.map((p) => p.id)}
+                  absentAwayPlayerIds={awayMissingPlayers.map((p) => p.id)}
+                />
+              </div>
+            )}
+
             {/* SECTION 2: CONTEXTE & FATIGUE */}
             {prediction.context_analysis && (
               <div className="border-t pt-4">
@@ -406,8 +418,8 @@ export function MatchPredictionModal({
                     <div>
                       <span className="font-medium block">Impact Absences</span>
                       <span className="text-[10px] text-muted-foreground">
-                        {homeMissingPlayers.length + awayMissingPlayers.length > 0 
-                          ? `${homeMissingPlayers.length + awayMissingPlayers.length} joueur(s) manquant(s)` 
+                        {homeMissingPlayers.length + awayMissingPlayers.length > 0
+                          ? `${homeMissingPlayers.length + awayMissingPlayers.length} joueur(s) manquant(s)`
                           : "Effectifs complets"}
                       </span>
                     </div>
@@ -437,17 +449,6 @@ export function MatchPredictionModal({
                     </span>
                   </div>
                 </Card>
-              </div>
-            )}
-            {/* SECTION 5: BARRE DE RISQUE DE BLOWOUT */}
-            {game?.homeTeam && game?.awayTeam && (
-              <div className="border-t pt-4">
-                <BlowoutBar
-                  homeTeamName={game.homeTeam}
-                  awayTeamName={game.awayTeam}
-                  absentHomePlayerIds={homeMissingPlayers.map((p) => p.id)}
-                  absentAwayPlayerIds={awayMissingPlayers.map((p) => p.id)}
-                />
               </div>
             )}
 
