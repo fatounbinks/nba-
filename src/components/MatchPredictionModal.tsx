@@ -40,6 +40,7 @@ import {
 } from "@/lib/fatigueUtils";
 import { BlowoutBar } from "@/components/BlowoutBar";
 import { ShootingBattleCard } from "@/components/ShootingBattleCard";
+import { useShootingPrediction } from "@/hooks/useShootingPrediction";
 
 interface MatchPredictionModalProps {
   open: boolean;
@@ -103,6 +104,12 @@ export function MatchPredictionModal({
       ),
     enabled: open && !!homeTeamId && !!awayTeamId,
   });
+
+  const { data: shootingPrediction } = useShootingPrediction(
+    homeTeamId,
+    awayTeamId,
+    open
+  );
 
   const addHomeMissingPlayer = useCallback(
     (player: Player) => {
@@ -340,14 +347,12 @@ export function MatchPredictionModal({
               </div>
             )}
 
-            {/* SECTION 5B: SHOOTING BATTLE - Uncomment when shooting prediction API is available */}
-            {/*
+            {/* SECTION 5B: SHOOTING BATTLE */}
             {shootingPrediction && (
               <div className="border-t pt-4">
                 <ShootingBattleCard data={shootingPrediction} />
               </div>
             )}
-            */}
 
             {/* SECTION 2: CONTEXTE & FATIGUE */}
             {prediction.context_analysis && (
