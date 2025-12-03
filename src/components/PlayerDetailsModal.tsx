@@ -259,7 +259,69 @@ export function PlayerDetailsModal({
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                   </div>
                 ) : recentFormAvg ? (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
+                    {/* Home/Away Splits Comparison Card */}
+                    {historyData?.splits && (historyData.splits.home || historyData.splits.away) && (
+                      <Card className="bg-muted/40 border-muted/60">
+                        <CardContent className="pt-6">
+                          <div className="space-y-3">
+                            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                              Domicile vs Extérieur - {selectedStat}
+                            </p>
+                            <div className="grid grid-cols-2 gap-4">
+                              {/* Home Split */}
+                              {historyData.splits.home && (
+                                <div
+                                  className={`p-4 rounded-lg border transition-all ${
+                                    isPlayerHome
+                                      ? "bg-blue-50/50 border-blue-200 ring-1 ring-blue-200"
+                                      : "bg-background border-border"
+                                  }`}
+                                >
+                                  <p className="text-xs text-muted-foreground font-medium mb-2">
+                                    {isPlayerHome ? "🏠 Domicile (Équipe)" : "🏠 Domicile"}
+                                  </p>
+                                  <p className="text-2xl font-bold text-primary">
+                                    {getSelectedStatValue("home")?.toFixed(1) || "-"}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground mt-2">{selectedStat}</p>
+                                  {historyData.splits.home.GP && (
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      {historyData.splits.home.GP} matchs
+                                    </p>
+                                  )}
+                                </div>
+                              )}
+
+                              {/* Away Split */}
+                              {historyData.splits.away && (
+                                <div
+                                  className={`p-4 rounded-lg border transition-all ${
+                                    !isPlayerHome
+                                      ? "bg-amber-50/50 border-amber-200 ring-1 ring-amber-200"
+                                      : "bg-background border-border"
+                                  }`}
+                                >
+                                  <p className="text-xs text-muted-foreground font-medium mb-2">
+                                    {!isPlayerHome ? "✈️ Extérieur (Équipe)" : "✈️ Extérieur"}
+                                  </p>
+                                  <p className="text-2xl font-bold text-primary">
+                                    {getSelectedStatValue("away")?.toFixed(1) || "-"}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground mt-2">{selectedStat}</p>
+                                  {historyData.splits.away.GP && (
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      {historyData.splits.away.GP} matchs
+                                    </p>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+
                     <div className="flex items-center gap-2 mb-2">
                       <CalendarDays className="h-4 w-4 text-blue-500" />
                       <p className="text-sm text-muted-foreground font-medium">
