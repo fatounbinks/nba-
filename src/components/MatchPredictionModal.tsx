@@ -104,11 +104,6 @@ export function MatchPredictionModal({
     enabled: open && !!homeTeamId && !!awayTeamId,
   });
 
-  const { data: shootingPrediction } = useShootingPrediction(
-    homeTeamId,
-    awayTeamId,
-    open
-  );
 
   const addHomeMissingPlayer = useCallback(
     (player: Player) => {
