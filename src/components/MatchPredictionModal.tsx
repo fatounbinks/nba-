@@ -105,11 +105,11 @@ export function MatchPredictionModal({
     enabled: open && !!homeTeamId && !!awayTeamId,
   });
 
-  const { data: shootingPrediction } = useQuery({
-    queryKey: ["shooting-prediction", homeTeamId, awayTeamId],
-    queryFn: () => nbaApi.getShootingPrediction(homeTeamId, awayTeamId),
-    enabled: open && !!homeTeamId && !!awayTeamId,
-  });
+  const { data: shootingPrediction } = useShootingPrediction(
+    homeTeamId,
+    awayTeamId,
+    open
+  );
 
   const addHomeMissingPlayer = useCallback(
     (player: Player) => {
