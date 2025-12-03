@@ -486,4 +486,15 @@ export const nbaApi = {
     if (!response.ok) throw new Error("Failed to fetch player popup data");
     return response.json();
   },
+
+  async getShootingPrediction(
+    homeTeamId: string,
+    awayTeamId: string
+  ): Promise<ShootingPrediction> {
+    const response = await fetch(
+      `${API_BASE_URL}/predict/shooting/${homeTeamId}/${awayTeamId}`
+    );
+    if (!response.ok) throw new Error("Failed to fetch shooting prediction");
+    return response.json();
+  },
 };
