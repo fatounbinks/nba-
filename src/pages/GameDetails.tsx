@@ -143,11 +143,13 @@ const GameDetails = () => {
         </div>
 
 
-        {/* Blowout Risk Simulator */}
+        {/* Blowout Risk Bar */}
         {currentGame.homeTeam && currentGame.awayTeam && (
-          <BlowoutRiskSimulator
+          <BlowoutBar
             homeTeamName={currentGame.homeTeam}
             awayTeamName={currentGame.awayTeam}
+            absentHomePlayerIds={homeAbsentPlayerIds}
+            absentAwayPlayerIds={awayAbsentPlayerIds}
           />
         )}
 
@@ -158,6 +160,10 @@ const GameDetails = () => {
             awayTeamId={awayTeamId}
             homeTeamName={currentGame.homeTeam}
             awayTeamName={currentGame.awayTeam}
+            homeAbsentPlayerIds={homeAbsentPlayerIds}
+            awayAbsentPlayerIds={awayAbsentPlayerIds}
+            onHomeAbsentPlayersChange={setHomeAbsentPlayerIds}
+            onAwayAbsentPlayersChange={setAwayAbsentPlayerIds}
           />
         )}
       </main>
