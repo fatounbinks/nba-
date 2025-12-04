@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { nbaApi, TodayGame } from "@/services/nbaApi";
 import { MatchSimulator } from "@/components/MatchSimulator";
+import { BlowoutBar } from "@/components/BlowoutBar";
 import { BlowoutRiskSimulator } from "@/components/BlowoutRiskSimulator";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +14,8 @@ import { getTeamCode } from "@/lib/teamMapping";
 const GameDetails = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
+  const [homeAbsentPlayerIds, setHomeAbsentPlayerIds] = useState<number[]>([]);
+  const [awayAbsentPlayerIds, setAwayAbsentPlayerIds] = useState<number[]>([]);
 
   const { data: games, isLoading: gamesLoading } = useQuery({
     queryKey: ["48h-games"],
@@ -139,11 +143,13 @@ const GameDetails = () => {
         </div>
 
 
-        {/* Blowout Risk Simulator */}
+        {/* Blowout Risk Bar */}
         {currentGame.homeTeam && currentGame.awayTeam && (
-          <BlowoutRiskSimulator
+          <BlowoutBar
             homeTeamName={currentGame.homeTeam}
             awayTeamName={currentGame.awayTeam}
+            absentHomePlayerIds={homeAbsentPlayerIds}
+            absentAwayPlayerIds={awayAbsentPlayerIds}
           />
         )}
 
@@ -154,6 +160,10 @@ const GameDetails = () => {
             awayTeamId={awayTeamId}
             homeTeamName={currentGame.homeTeam}
             awayTeamName={currentGame.awayTeam}
+            homeAbsentPlayerIds={homeAbsentPlayerIds}
+            awayAbsentPlayerIds={awayAbsentPlayerIds}
+            onHomeAbsentPlayersChange={setHomeAbsentPlayerIds}
+            onAwayAbsentPlayersChange={setAwayAbsentPlayerIds}
           />
         )}
       </main>
