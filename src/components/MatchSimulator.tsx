@@ -26,6 +26,10 @@ interface MatchSimulatorProps {
   awayTeamId: string;
   homeTeamName: string;
   awayTeamName: string;
+  homeAbsentPlayerIds?: number[];
+  awayAbsentPlayerIds?: number[];
+  onHomeAbsentPlayersChange?: (ids: number[]) => void;
+  onAwayAbsentPlayersChange?: (ids: number[]) => void;
 }
 
 export function MatchSimulator({
