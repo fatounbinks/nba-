@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Player } from "@/services/nbaApi";
 import { PlayerSearch } from "@/components/PlayerSearch";
 import { PlayerDashboard } from "@/components/PlayerDashboard";
@@ -12,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { MatchPredictionModal } from "@/components/MatchPredictionModal";
 
 const Home = () => {
+  const navigate = useNavigate();
   const [selectedPlayer, setSelectedPlayer] = useState<Player | undefined>();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGame, setSelectedGame] = useState<TodayGame | null>(null);
