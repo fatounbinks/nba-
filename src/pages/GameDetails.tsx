@@ -323,8 +323,487 @@ const GameDetails = () => {
         </div>
 
 
+        {/* Prediction Section */}
+        {prediction && (
+          <div className="space-y-6 mb-8">
+            {/* SECTION 1: EN-TÊTE (RÉSULTAT PRINCIPAL) */}
+            <div className="space-y-3">
+              {/* Vainqueur Prédit */}
+              <Card className="bg-gradient-to-r from-purple-500/10 to-amber-500/10 border-purple-200 dark:border-purple-800">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <Trophy className="h-8 w-8 text-yellow-500 flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">
+                        Vainqueur Prédit
+                      </p>
+                      <p
+                        className={`text-2xl font-bold leading-tight ${getWinnerColor(
+                          prediction.predicted_winner
+                        )}`}
+                      >
+                        {prediction.predicted_winner}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Marge : +{(Math.abs(prediction?.predicted_margin || 0)).toFixed(1)} pts
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Barre de Probabilité Home vs Away */}
+              <Card className="p-3">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-muted-foreground">
+                      PROBABILITÉ DE VICTOIRE
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
+                          {currentGame?.homeTeam}
+                        </span>
+                        <span className="text-sm font-bold text-purple-600 dark:text-purple-400">
+                          {(Math.max(0, prediction?.win_probability_home || 0)).toFixed(0)}%
+                        </span>
+                      </div>
+                      <Progress
+                        value={Math.max(0, prediction?.win_probability_home || 0)}
+                        className="h-2"
+                      />
+                    </div>
+                    <div className="text-xs text-muted-foreground font-semibold">VS</div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-bold text-amber-600 dark:text-amber-400">
+                          {(Math.max(0, 100 - (prediction?.win_probability_home || 0))).toFixed(0)}%
+                        </span>
+                        <span className="text-sm font-medium text-amber-600 dark:text-amber-400">
+                          {currentGame?.awayTeam}
+                        </span>
+                      </div>
+                      <Progress
+                        value={Math.max(0, 100 - (prediction?.win_probability_home || 0))}
+                        className="h-2"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Confiance et Total Estimé */}
+              <div className="grid grid-cols-2 gap-3">
+                {/* Confiance */}
+                <Card className="p-3">
+                  <div className="space-y-2">
+                    <span className="text-xs font-semibold text-muted-foreground block">
+                      CONFIANCE IA
+                    </span>
+                    <Badge
+                      className={`text-xs px-2 py-1 w-fit ${getConfidenceBadgeColor(
+                        prediction?.confidence_level
+                      )}`}
+                    >
+                      {prediction?.confidence_level || "Analyse en cours..."}
+                    </Badge>
+                  </div>
+                </Card>
+
+                {/* Total Estimé */}
+                <Card className="p-3">
+                  <div className="space-y-2">
+                    <span className="text-xs font-semibold text-muted-foreground block">
+                      TOTAL ESTIMÉ
+                    </span>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-2xl font-bold text-teal-600 dark:text-teal-400">
+                        ~{(prediction?.predicted_total_points || 0).toFixed(0)}
+                      </span>
+                      <span className="text-xs text-muted-foreground">pts</span>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            </div>
+
+            {/* SECTION 5: BARRE DE RISQUE DE BLOWOUT */}
+            {currentGame?.homeTeam && currentGame?.awayTeam && (
+              <div className="border-t pt-4">
+                <BlowoutBar
+                  homeTeamName={currentGame.homeTeam}
+                  awayTeamName={currentGame.awayTeam}
+                  absentHomePlayerIds={homeMissingPlayers.map((p) => p.id)}
+                  absentAwayPlayerIds={awayMissingPlayers.map((p) => p.id)}
+                />
+              </div>
+            )}
+
+            {/* SECTION 5B: SHOOTING BATTLE */}
+            {homeTeamId && awayTeamId && (
+              <div className="border-t pt-4">
+                <ShootingBattleCard
+                  homeTeamCode={homeTeamId}
+                  awayTeamCode={awayTeamId}
+                  homeMissingPlayers={homeMissingPlayers}
+                  awayMissingPlayers={awayMissingPlayers}
+                />
+              </div>
+            )}
+
+            {/* SECTION 2: CONTEXTE & FATIGUE */}
+            {prediction.context_analysis && (
+              <div className="border-t pt-4">
+                <h3 className="text-xs font-bold text-muted-foreground uppercase mb-3 tracking-wider">
+                  Contexte & Fatigue
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <Card className="p-3 border-l-4 border-l-purple-500">
+                    {renderFatigueSection(
+                      currentGame?.homeTeam,
+                      prediction.context_analysis.home_fatigue_factors,
+                      "home"
+                    )}
+                  </Card>
+                  <Card className="p-3 border-l-4 border-l-amber-500">
+                    {renderFatigueSection(
+                      currentGame?.awayTeam,
+                      prediction.context_analysis.away_fatigue_factors,
+                      "away"
+                    )}
+                  </Card>
+                </div>
+              </div>
+            )}
+
+            {/* SECTION 3 & 4 REVISITÉES : EXPLICATION DU CALCUL (MATH BREAKDOWN) */}
+            {prediction.math_breakdown && (
+              <div className="border-t pt-4">
+                <h3 className="text-xs font-bold text-muted-foreground uppercase mb-3 tracking-wider flex items-center gap-2">
+                  <Brain className="h-4 w-4" />
+                  Logique de Prédiction
+                </h3>
+
+                <Card className="overflow-hidden">
+                  <div className="text-xs grid grid-cols-[1fr_auto_auto] gap-2 p-3 items-center border-b bg-muted/30 font-medium">
+                    <span>Facteur</span>
+                    <span className="text-right">Impact</span>
+                    <span className="text-right w-12">Pts</span>
+                  </div>
+
+                  {/* 1. Base Spread (Net Rating + Home Court) */}
+                  <div className="grid grid-cols-[1fr_auto_auto] gap-2 p-3 items-center border-b border-dashed">
+                    <div>
+                      <span className="font-medium block">Écart de Niveau</span>
+                      <span className="text-[10px] text-muted-foreground">
+                        {prediction.math_breakdown.base_spread.desc}
+                      </span>
+                    </div>
+                    <Badge variant="outline" className="text-[10px] h-5">Base</Badge>
+                    <span className={`font-mono font-bold text-right ${prediction.math_breakdown.base_spread.value > 0 ? "text-purple-600" : "text-amber-600"}`}>
+                      {prediction.math_breakdown.base_spread.value > 0 ? "+" : ""}
+                      {prediction.math_breakdown.base_spread.value}
+                    </span>
+                  </div>
+
+                  {/* 2. Fatigue Adjustment */}
+                  <div className="grid grid-cols-[1fr_auto_auto] gap-2 p-3 items-center border-b border-dashed">
+                    <div>
+                      <span className="font-medium block">Fatigue & Calendrier</span>
+                      <span className="text-[10px] text-muted-foreground">
+                        {prediction.math_breakdown.fatigue_adjust.desc}
+                      </span>
+                    </div>
+                    {Math.abs(prediction.math_breakdown.fatigue_adjust.value) > 0 ? (
+                      <Badge variant="secondary" className="text-[10px] h-5 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">Important</Badge>
+                    ) : (
+                      <span className="text-[10px] text-muted-foreground">-</span>
+                    )}
+                    <span className={`font-mono font-bold text-right ${prediction.math_breakdown.fatigue_adjust.value === 0 ? "text-muted-foreground" : "text-red-500"}`}>
+                      {prediction.math_breakdown.fatigue_adjust.value > 0 ? "+" : ""}
+                      {prediction.math_breakdown.fatigue_adjust.value}
+                    </span>
+                  </div>
+
+                  {/* 3. Absences Adjustment */}
+                  <div className="grid grid-cols-[1fr_auto_auto] gap-2 p-3 items-center border-b border-dashed">
+                    <div>
+                      <span className="font-medium block">Impact Absences</span>
+                      <span className="text-[10px] text-muted-foreground">
+                        {homeMissingPlayers.length + awayMissingPlayers.length > 0
+                          ? `${homeMissingPlayers.length + awayMissingPlayers.length} joueur(s) manquant(s)`
+                          : "Effectifs complets"}
+                      </span>
+                    </div>
+                    {Math.abs(prediction.math_breakdown.absences_adjust.value) > 2 ? (
+                      <Badge variant="secondary" className="text-[10px] h-5 bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">Majeur</Badge>
+                    ) : (
+                      <span className="text-[10px] text-muted-foreground">-</span>
+                    )}
+                    <span className={`font-mono font-bold text-right ${prediction.math_breakdown.absences_adjust.value === 0 ? "text-muted-foreground" : "text-orange-500"}`}>
+                      {prediction.math_breakdown.absences_adjust.value > 0 ? "+" : ""}
+                      {prediction.math_breakdown.absences_adjust.value}
+                    </span>
+                  </div>
+
+                  {/* RESULTAT FINAL */}
+                  <div className="grid grid-cols-[1fr_auto_auto] gap-2 p-3 items-center bg-primary/5">
+                    <div>
+                      <span className="font-bold text-sm text-primary">SPREAD FINAL ESTIMÉ</span>
+                      <span className="text-[10px] text-muted-foreground block">
+                        Positif = {currentGame?.homeTeam} gagne / Négatif = {currentGame?.awayTeam} gagne
+                      </span>
+                    </div>
+                    <div></div>
+                    <span className={`font-mono font-black text-lg text-right ${prediction.math_breakdown.final_spread > 0 ? "text-purple-600" : "text-amber-600"}`}>
+                      {prediction.math_breakdown.final_spread > 0 ? "+" : ""}
+                      {prediction.math_breakdown.final_spread.toFixed(1)}
+                    </span>
+                  </div>
+                </Card>
+              </div>
+            )}
+
+            {/* SECTION 6: SÉLECTION DES JOUEURS ABSENTS */}
+            <div className="space-y-4 border-t pt-4">
+              {/* Home Missing Players */}
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground block mb-2">
+                  JOUEURS ABSENTS - {currentGame?.homeTeam}
+                </label>
+                <Popover
+                  open={homePopoverOpen}
+                  onOpenChange={setHomePopoverOpen}
+                >
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={homePopoverOpen}
+                      className="w-full justify-between text-left font-normal"
+                    >
+                      <span className="text-muted-foreground">
+                        {homeMissingPlayers.length === 0
+                          ? "Ajouter des joueurs..."
+                          : `${homeMissingPlayers.length} joueur(s) sélectionné(s)`}
+                      </span>
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0" align="start">
+                    <Command>
+                      <Input
+                        placeholder="Chercher par nom..."
+                        value={homeSearchQuery}
+                        onChange={(e) => setHomeSearchQuery(e.target.value)}
+                        className="border-0 border-b rounded-none focus-visible:ring-0"
+                      />
+                      <CommandList>
+                        <CommandEmpty>Aucun joueur trouvé.</CommandEmpty>
+                        <CommandGroup>
+                          {homePlayerSearchResults.map((player) => (
+                            <CommandItem
+                              key={player.id}
+                              value={player.full_name}
+                              onSelect={() => addHomeMissingPlayer(player)}
+                              disabled={
+                                homeMissingPlayers.find(
+                                  (p) => p.id === player.id
+                                ) !== undefined
+                              }
+                            >
+                              {player.full_name}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                {homeMissingPlayers.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {homeMissingPlayers.map((player) => (
+                      <Badge
+                        key={player.id}
+                        variant="secondary"
+                        className="gap-1"
+                      >
+                        {player.full_name}
+                        <button
+                          onClick={() => removeHomeMissingPlayer(player.id)}
+                          className="ml-1 hover:text-foreground"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Away Missing Players */}
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground block mb-2">
+                  JOUEURS ABSENTS - {currentGame?.awayTeam}
+                </label>
+                <Popover
+                  open={awayPopoverOpen}
+                  onOpenChange={setAwayPopoverOpen}
+                >
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={awayPopoverOpen}
+                      className="w-full justify-between text-left font-normal"
+                    >
+                      <span className="text-muted-foreground">
+                        {awayMissingPlayers.length === 0
+                          ? "Ajouter des joueurs..."
+                          : `${awayMissingPlayers.length} joueur(s) sélectionné(s)`}
+                      </span>
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0" align="start">
+                    <Command>
+                      <Input
+                        placeholder="Chercher par nom..."
+                        value={awaySearchQuery}
+                        onChange={(e) => setAwaySearchQuery(e.target.value)}
+                        className="border-0 border-b rounded-none focus-visible:ring-0"
+                      />
+                      <CommandList>
+                        <CommandEmpty>Aucun joueur trouvé.</CommandEmpty>
+                        <CommandGroup>
+                          {awayPlayerSearchResults.map((player) => (
+                            <CommandItem
+                              key={player.id}
+                              value={player.full_name}
+                              onSelect={() => addAwayMissingPlayer(player)}
+                              disabled={
+                                awayMissingPlayers.find(
+                                  (p) => p.id === player.id
+                                ) !== undefined
+                              }
+                            >
+                              {player.full_name}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                {awayMissingPlayers.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {awayMissingPlayers.map((player) => (
+                      <Badge
+                        key={player.id}
+                        variant="secondary"
+                        className="gap-1"
+                      >
+                        {player.full_name}
+                        <button
+                          onClick={() => removeAwayMissingPlayer(player.id)}
+                          className="ml-1 hover:text-foreground"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* SECTION 7: SÉLECTION RAPIDE DES JOUEURS PAR BOUTONS */}
+              <div className="space-y-4 border-t pt-4">
+                {/* Home Team Players */}
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground block mb-3">
+                    JOUEURS - {currentGame?.homeTeam} (Cliquez pour voir les projections)
+                  </label>
+                  <div className="grid grid-cols-1 gap-2">
+                    {homeRoster.slice(0, 14).map((player) => {
+                      const isAbsent = homeMissingPlayers.some((p) => p.id === player.id);
+                      const playerProjection = fullMatchPrediction?.home_players?.find(
+                        (p) => p.player_id === player.id
+                      );
+                      return (
+                        <button
+                          key={player.id}
+                          onClick={() => handlePlayerClick(player, true)}
+                          disabled={isAbsent}
+                          className={`p-2 rounded border transition-all text-left text-xs ${
+                            isAbsent
+                              ? "text-muted-foreground line-through opacity-50 cursor-not-allowed bg-secondary/50 border-border/30"
+                              : "bg-secondary hover:bg-primary/20 text-foreground border-border/50 hover:border-primary/50 cursor-pointer"
+                          }`}
+                          title={`Cliquez pour voir projections de ${player.full_name}`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium truncate flex-1">{player.full_name}</span>
+                            {playerProjection && (
+                              <span className="ml-2 text-[11px] text-muted-foreground whitespace-nowrap">
+                                {playerProjection.predicted_stats.PTS?.toFixed(1) || "—"}pts
+                                {playerProjection.predicted_stats.REB && ` / ${playerProjection.predicted_stats.REB.toFixed(1)}reb`}
+                                {playerProjection.predicted_stats.AST && ` / ${playerProjection.predicted_stats.AST.toFixed(1)}ast`}
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Away Team Players */}
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground block mb-3">
+                    JOUEURS - {currentGame?.awayTeam} (Cliquez pour voir les projections)
+                  </label>
+                  <div className="grid grid-cols-1 gap-2">
+                    {awayRoster.slice(0, 14).map((player) => {
+                      const isAbsent = awayMissingPlayers.some((p) => p.id === player.id);
+                      const playerProjection = fullMatchPrediction?.away_players?.find(
+                        (p) => p.player_id === player.id
+                      );
+                      return (
+                        <button
+                          key={player.id}
+                          onClick={() => handlePlayerClick(player, false)}
+                          disabled={isAbsent}
+                          className={`p-2 rounded border transition-all text-left text-xs ${
+                            isAbsent
+                              ? "text-muted-foreground line-through opacity-50 cursor-not-allowed bg-secondary/50 border-border/30"
+                              : "bg-secondary hover:bg-primary/20 text-foreground border-border/50 hover:border-primary/50 cursor-pointer"
+                          }`}
+                          title={`Cliquez pour voir projections de ${player.full_name}`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium truncate flex-1">{player.full_name}</span>
+                            {playerProjection && (
+                              <span className="ml-2 text-[11px] text-muted-foreground whitespace-nowrap">
+                                {playerProjection.predicted_stats.PTS?.toFixed(1) || "—"}pts
+                                {playerProjection.predicted_stats.REB && ` / ${playerProjection.predicted_stats.REB.toFixed(1)}reb`}
+                                {playerProjection.predicted_stats.AST && ` / ${playerProjection.predicted_stats.AST.toFixed(1)}ast`}
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Blowout Risk Bar */}
-        {currentGame.homeTeam && currentGame.awayTeam && (
+        {currentGame.homeTeam && currentGame.awayTeam && !prediction && (
           <BlowoutBar
             homeTeamName={currentGame.homeTeam}
             awayTeamName={currentGame.awayTeam}
@@ -334,7 +813,7 @@ const GameDetails = () => {
         )}
 
         {/* Interactive Match Simulator */}
-        {homeTeamId && awayTeamId && (
+        {homeTeamId && awayTeamId && !prediction && (
           <MatchSimulator
             homeTeamId={homeTeamId}
             awayTeamId={awayTeamId}
