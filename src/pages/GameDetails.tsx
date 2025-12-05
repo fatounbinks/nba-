@@ -1,15 +1,22 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { nbaApi, TodayGame } from "@/services/nbaApi";
+import { nbaApi, TodayGame, Player } from "@/services/nbaApi";
 import { MatchSimulator } from "@/components/MatchSimulator";
 import { BlowoutBar } from "@/components/BlowoutBar";
-import { BlowoutRiskSimulator } from "@/components/BlowoutRiskSimulator";
+import { ShootingBattleCard } from "@/components/ShootingBattleCard";
+import { PlayerPopupModal } from "@/components/PlayerPopupModal";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
+import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Activity, AlertTriangle, ArrowLeft } from "lucide-react";
+import { Activity, AlertTriangle, ArrowLeft, Trophy, Brain, ChevronsUpDown, X, AlertCircle } from "lucide-react";
 import { getTeamCode } from "@/lib/teamMapping";
+import { getFatigueFactor, getRestBadge } from "@/lib/fatigueUtils";
 
 const GameDetails = () => {
   const { gameId } = useParams<{ gameId: string }>();
