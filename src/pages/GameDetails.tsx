@@ -833,6 +833,18 @@ const GameDetails = () => {
           <p>NBA Betting Insights Dashboard • Data from NBA Stats API</p>
         </div>
       </footer>
+
+      {/* Player Popup Modal */}
+      {selectedPlayerForPopup && (
+        <PlayerPopupModal
+          open={playerPopupOpen}
+          onOpenChange={setPlayerPopupOpen}
+          playerId={selectedPlayerForPopup.player.id}
+          playerName={selectedPlayerForPopup.player.full_name}
+          opponentTeamId={selectedPlayerForPopup.isHome ? awayTeamId : homeTeamId}
+          opponentTeamName={selectedPlayerForPopup.isHome ? currentGame?.awayTeam || "" : currentGame?.homeTeam || ""}
+        />
+      )}
     </div>
   );
 };
