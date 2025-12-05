@@ -40,6 +40,7 @@ import {
 } from "@/lib/fatigueUtils";
 import { BlowoutBar } from "@/components/BlowoutBar";
 import { ShootingBattleCard } from "@/components/ShootingBattleCard";
+import { PlayerPopupModal } from "@/components/PlayerPopupModal";
 
 interface MatchPredictionModalProps {
   open: boolean;
@@ -58,6 +59,8 @@ export function MatchPredictionModal({
   const [awaySearchQuery, setAwaySearchQuery] = useState("");
   const [homePopoverOpen, setHomePopoverOpen] = useState(false);
   const [awayPopoverOpen, setAwayPopoverOpen] = useState(false);
+  const [selectedPlayerForPopup, setSelectedPlayerForPopup] = useState<{ player: Player; isHome: boolean } | null>(null);
+  const [playerPopupOpen, setPlayerPopupOpen] = useState(false);
 
   const homeTeamId = game ? getTeamCode(game.homeTeam) : "";
   const awayTeamId = game ? getTeamCode(game.awayTeam) : "";
@@ -141,6 +144,14 @@ export function MatchPredictionModal({
     [awayMissingPlayers]
   );
 
+  const handlePlayerClick = useCallback(
+    (player: Player, isHome: boolean) => {
+      setSelectedPlayerForPopup({ player, isHome });
+      setPlayerPopupOpen(true);
+    },
+    []
+  );
+
   const getConfidenceBadgeColor = (level: string | undefined | null) => {
     if (!level) return "bg-gray-500 text-white border-gray-600";
     const lower = level.toLowerCase();
@@ -207,6 +218,7 @@ export function MatchPredictionModal({
   };
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[700px] p-4 gap-4 max-h-[90vh] overflow-y-auto">
         <DialogHeader className="pb-2 border-b">
@@ -623,25 +635,25 @@ export function MatchPredictionModal({
                 {/* Home Team Players */}
                 <div>
                   <label className="text-xs font-semibold text-muted-foreground block mb-3">
-                    JOUEURS - {game?.homeTeam}
+                    JOUEURS - {game?.homeTeam} (Cliquez pour voir les projections)
                   </label>
                   <div className="grid grid-cols-5 lg:grid-cols-7 gap-1">
                     {homeRoster.slice(0, 14).map((player) => {
                       const isAbsent = homeMissingPlayers.some((p) => p.id === player.id);
                       return (
-                        <Button
+                        <button
                           key={player.id}
-                          onClick={() => addHomeMissingPlayer(player)}
+                          onClick={() => handlePlayerClick(player, true)}
                           disabled={isAbsent}
-                          className={`h-6 text-[10px] truncate px-1 ${
+                          className={`h-6 text-[10px] truncate px-1 rounded border transition-all ${
                             isAbsent
-                              ? "text-muted-foreground line-through opacity-50 cursor-not-allowed bg-secondary/50"
-                              : "bg-secondary hover:bg-secondary/80 text-foreground"
+                              ? "text-muted-foreground line-through opacity-50 cursor-not-allowed bg-secondary/50 border-border/30"
+                              : "bg-secondary hover:bg-primary/20 text-foreground border-border/50 hover:border-primary/50 cursor-pointer"
                           }`}
-                          variant="outline"
+                          title={`Cliquez pour voir projections de ${player.full_name}`}
                         >
                           {player.full_name}
-                        </Button>
+                        </button>
                       );
                     })}
                   </div>
@@ -650,25 +662,25 @@ export function MatchPredictionModal({
                 {/* Away Team Players */}
                 <div>
                   <label className="text-xs font-semibold text-muted-foreground block mb-3">
-                    JOUEURS - {game?.awayTeam}
+                    JOUEURS - {game?.awayTeam} (Cliquez pour voir les projections)
                   </label>
                   <div className="grid grid-cols-5 lg:grid-cols-7 gap-1">
                     {awayRoster.slice(0, 14).map((player) => {
                       const isAbsent = awayMissingPlayers.some((p) => p.id === player.id);
                       return (
-                        <Button
+                        <button
                           key={player.id}
-                          onClick={() => addAwayMissingPlayer(player)}
+                          onClick={() => handlePlayerClick(player, false)}
                           disabled={isAbsent}
-                          className={`h-6 text-[10px] truncate px-1 ${
+                          className={`h-6 text-[10px] truncate px-1 rounded border transition-all ${
                             isAbsent
-                              ? "text-muted-foreground line-through opacity-50 cursor-not-allowed bg-secondary/50"
-                              : "bg-secondary hover:bg-secondary/80 text-foreground"
+                              ? "text-muted-foreground line-through opacity-50 cursor-not-allowed bg-secondary/50 border-border/30"
+                              : "bg-secondary hover:bg-primary/20 text-foreground border-border/50 hover:border-primary/50 cursor-pointer"
                           }`}
-                          variant="outline"
+                          title={`Cliquez pour voir projections de ${player.full_name}`}
                         >
                           {player.full_name}
-                        </Button>
+                        </button>
                       );
                     })}
                   </div>
@@ -702,5 +714,17 @@ export function MatchPredictionModal({
         )}
       </DialogContent>
     </Dialog>
+
+    {selectedPlayerForPopup && (
+      <PlayerPopupModal
+        open={playerPopupOpen}
+        onOpenChange={setPlayerPopupOpen}
+        playerId={selectedPlayerForPopup.player.id}
+        playerName={selectedPlayerForPopup.player.full_name}
+        opponentTeamId={selectedPlayerForPopup.isHome ? awayTeamId : homeTeamId}
+        opponentTeamName={selectedPlayerForPopup.isHome ? game?.awayTeam || "" : game?.homeTeam || ""}
+      />
+    )}
+    </>
   );
 }
