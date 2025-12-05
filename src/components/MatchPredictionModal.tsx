@@ -144,6 +144,14 @@ export function MatchPredictionModal({
     [awayMissingPlayers]
   );
 
+  const handlePlayerClick = useCallback(
+    (player: Player, isHome: boolean) => {
+      setSelectedPlayerForPopup({ player, isHome });
+      setPlayerPopupOpen(true);
+    },
+    []
+  );
+
   const getConfidenceBadgeColor = (level: string | undefined | null) => {
     if (!level) return "bg-gray-500 text-white border-gray-600";
     const lower = level.toLowerCase();
