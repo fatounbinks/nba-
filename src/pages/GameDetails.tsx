@@ -23,6 +23,14 @@ const GameDetails = () => {
   const navigate = useNavigate();
   const [homeAbsentPlayerIds, setHomeAbsentPlayerIds] = useState<number[]>([]);
   const [awayAbsentPlayerIds, setAwayAbsentPlayerIds] = useState<number[]>([]);
+  const [homeMissingPlayers, setHomeMissingPlayers] = useState<Player[]>([]);
+  const [awayMissingPlayers, setAwayMissingPlayers] = useState<Player[]>([]);
+  const [homeSearchQuery, setHomeSearchQuery] = useState("");
+  const [awaySearchQuery, setAwaySearchQuery] = useState("");
+  const [homePopoverOpen, setHomePopoverOpen] = useState(false);
+  const [awayPopoverOpen, setAwayPopoverOpen] = useState(false);
+  const [selectedPlayerForPopup, setSelectedPlayerForPopup] = useState<{ player: Player; isHome: boolean } | null>(null);
+  const [playerPopupOpen, setPlayerPopupOpen] = useState(false);
 
   const { data: games, isLoading: gamesLoading } = useQuery({
     queryKey: ["48h-games"],
@@ -33,7 +41,172 @@ const GameDetails = () => {
   const homeTeamId = currentGame?.homeTeamId || (currentGame ? getTeamCode(currentGame.homeTeam) : "");
   const awayTeamId = currentGame?.awayTeamId || (currentGame ? getTeamCode(currentGame.awayTeam) : "");
 
-  const isLoading = gamesLoading;
+  const { data: homeRoster = [] } = useQuery({
+    queryKey: ["team-roster", homeTeamId],
+    queryFn: () => nbaApi.getTeamRoster(homeTeamId),
+    enabled: !!homeTeamId,
+  });
+
+  const { data: awayRoster = [] } = useQuery({
+    queryKey: ["team-roster", awayTeamId],
+    queryFn: () => nbaApi.getTeamRoster(awayTeamId),
+    enabled: !!awayTeamId,
+  });
+
+  const { data: prediction, isLoading: predictionLoading, refetch } = useQuery({
+    queryKey: [
+      "match-prediction",
+      homeTeamId,
+      awayTeamId,
+      homeMissingPlayers.map((p) => p.id).join(","),
+      awayMissingPlayers.map((p) => p.id).join(","),
+    ],
+    queryFn: () =>
+      nbaApi.predictMatch(
+        homeTeamId,
+        awayTeamId,
+        homeMissingPlayers.map((p) => p.id),
+        awayMissingPlayers.map((p) => p.id)
+      ),
+    enabled: !!homeTeamId && !!awayTeamId,
+  });
+
+  const { data: fullMatchPrediction } = useQuery({
+    queryKey: [
+      "full-match-prediction",
+      homeTeamId,
+      awayTeamId,
+      homeMissingPlayers.map((p) => p.id).join(","),
+      awayMissingPlayers.map((p) => p.id).join(","),
+    ],
+    queryFn: () =>
+      nbaApi.getFullMatchPredictionWithAbsents(
+        homeTeamId,
+        awayTeamId,
+        homeMissingPlayers.map((p) => p.id),
+        awayMissingPlayers.map((p) => p.id)
+      ),
+    enabled: !!homeTeamId && !!awayTeamId,
+  });
+
+  const homePlayerSearchResults = homeRoster.filter((player) =>
+    player.full_name.toLowerCase().includes(homeSearchQuery.toLowerCase())
+  );
+
+  const awayPlayerSearchResults = awayRoster.filter((player) =>
+    player.full_name.toLowerCase().includes(awaySearchQuery.toLowerCase())
+  );
+
+  const addHomeMissingPlayer = useCallback(
+    (player: Player) => {
+      if (!homeMissingPlayers.find((p) => p.id === player.id)) {
+        setHomeMissingPlayers([...homeMissingPlayers, player]);
+      }
+      setHomeSearchQuery("");
+      setHomePopoverOpen(false);
+    },
+    [homeMissingPlayers]
+  );
+
+  const addAwayMissingPlayer = useCallback(
+    (player: Player) => {
+      if (!awayMissingPlayers.find((p) => p.id === player.id)) {
+        setAwayMissingPlayers([...awayMissingPlayers, player]);
+      }
+      setAwaySearchQuery("");
+      setAwayPopoverOpen(false);
+    },
+    [awayMissingPlayers]
+  );
+
+  const removeHomeMissingPlayer = useCallback(
+    (playerId: number) => {
+      setHomeMissingPlayers(homeMissingPlayers.filter((p) => p.id !== playerId));
+    },
+    [homeMissingPlayers]
+  );
+
+  const removeAwayMissingPlayer = useCallback(
+    (playerId: number) => {
+      setAwayMissingPlayers(awayMissingPlayers.filter((p) => p.id !== playerId));
+    },
+    [awayMissingPlayers]
+  );
+
+  const handlePlayerClick = useCallback(
+    (player: Player, isHome: boolean) => {
+      setSelectedPlayerForPopup({ player, isHome });
+      setPlayerPopupOpen(true);
+    },
+    []
+  );
+
+  const getConfidenceBadgeColor = (level: string | undefined | null) => {
+    if (!level) return "bg-gray-500 text-white border-gray-600";
+    const lower = level.toLowerCase();
+    if (lower.includes("indécis") || lower.includes("tight") || lower.includes("serré"))
+      return "bg-amber-500/20 text-amber-700 border-amber-500/30";
+    if (lower.includes("solid") || lower.includes("solide"))
+      return "bg-emerald-500/20 text-emerald-700 border-emerald-500/30";
+    if (lower.includes("blowout"))
+      return "bg-red-500/20 text-red-700 border-red-500/30";
+    return "bg-primary/20";
+  };
+
+  const getWinnerColor = (winner: string) => {
+    return winner === currentGame?.homeTeam
+      ? "text-purple-600 dark:text-purple-400"
+      : "text-amber-600 dark:text-amber-400";
+  };
+
+  const renderFatigueSection = (
+    teamName: string | undefined,
+    factors: string[] | undefined,
+    position: "home" | "away"
+  ) => {
+    const factorsList = factors || [];
+    const hasFactors = factorsList.length > 0;
+
+    return (
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-sm">{teamName}</h3>
+          {position === "home" && (
+            <span className="text-xs text-muted-foreground">(Domicile)</span>
+          )}
+          {position === "away" && (
+            <span className="text-xs text-muted-foreground">(Extérieur)</span>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {hasFactors ? (
+            factorsList.map((factor, idx) => {
+              const fatigueInfo = getFatigueFactor(factor);
+              return (
+                <Badge
+                  key={idx}
+                  className={`text-xs py-1 px-2 border ${fatigueInfo.bgColor} ${fatigueInfo.color}`}
+                >
+                  <AlertCircle className="h-3 w-3 mr-1" />
+                  {fatigueInfo.icon} {fatigueInfo.name}
+                </Badge>
+              );
+            })
+          ) : (
+            <Badge
+              className={`text-xs py-1 px-2 border ${
+                getRestBadge().bgColor
+              } ${getRestBadge().color}`}
+            >
+              {getRestBadge().icon} {getRestBadge().name}
+            </Badge>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const isLoading = gamesLoading || predictionLoading;
 
   if (isLoading) {
     return (
