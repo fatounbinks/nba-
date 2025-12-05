@@ -218,6 +218,7 @@ export function MatchPredictionModal({
   };
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[700px] p-4 gap-4 max-h-[90vh] overflow-y-auto">
         <DialogHeader className="pb-2 border-b">
@@ -713,5 +714,17 @@ export function MatchPredictionModal({
         )}
       </DialogContent>
     </Dialog>
+
+    {selectedPlayerForPopup && (
+      <PlayerPopupModal
+        open={playerPopupOpen}
+        onOpenChange={setPlayerPopupOpen}
+        playerId={selectedPlayerForPopup.player.id}
+        playerName={selectedPlayerForPopup.player.full_name}
+        opponentTeamId={selectedPlayerForPopup.isHome ? awayTeamId : homeTeamId}
+        opponentTeamName={selectedPlayerForPopup.isHome ? game?.awayTeam || "" : game?.homeTeam || ""}
+      />
+    )}
+    </>
   );
 }
