@@ -228,8 +228,8 @@ const Home = () => {
                       )}
 
                       <div className="relative space-y-4">
-                        {/* Teams and Score */}
-                        <div className="space-y-3">
+                        {/* Teams and Score - Clickable */}
+                        <div className="space-y-3 cursor-pointer transition-opacity hover:opacity-80" onClick={() => navigate(`/game/${game.gameId}`)}>
                           {/* Away Team */}
                           <div className="flex items-center justify-between gap-2">
                             <span className="font-display font-semibold text-foreground text-sm flex-1 truncate" title={game.awayTeam}>
