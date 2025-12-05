@@ -59,6 +59,8 @@ export function MatchPredictionModal({
   const [awaySearchQuery, setAwaySearchQuery] = useState("");
   const [homePopoverOpen, setHomePopoverOpen] = useState(false);
   const [awayPopoverOpen, setAwayPopoverOpen] = useState(false);
+  const [selectedPlayerForPopup, setSelectedPlayerForPopup] = useState<{ player: Player; isHome: boolean } | null>(null);
+  const [playerPopupOpen, setPlayerPopupOpen] = useState(false);
 
   const homeTeamId = game ? getTeamCode(game.homeTeam) : "";
   const awayTeamId = game ? getTeamCode(game.awayTeam) : "";
