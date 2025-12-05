@@ -40,6 +40,7 @@ import {
 } from "@/lib/fatigueUtils";
 import { BlowoutBar } from "@/components/BlowoutBar";
 import { ShootingBattleCard } from "@/components/ShootingBattleCard";
+import { PlayerPopupModal } from "@/components/PlayerPopupModal";
 
 interface MatchPredictionModalProps {
   open: boolean;
