@@ -634,25 +634,25 @@ export function MatchPredictionModal({
                 {/* Home Team Players */}
                 <div>
                   <label className="text-xs font-semibold text-muted-foreground block mb-3">
-                    JOUEURS - {game?.homeTeam}
+                    JOUEURS - {game?.homeTeam} (Cliquez pour voir les projections)
                   </label>
                   <div className="grid grid-cols-5 lg:grid-cols-7 gap-1">
                     {homeRoster.slice(0, 14).map((player) => {
                       const isAbsent = homeMissingPlayers.some((p) => p.id === player.id);
                       return (
-                        <Button
+                        <button
                           key={player.id}
-                          onClick={() => addHomeMissingPlayer(player)}
+                          onClick={() => handlePlayerClick(player, true)}
                           disabled={isAbsent}
-                          className={`h-6 text-[10px] truncate px-1 ${
+                          className={`h-6 text-[10px] truncate px-1 rounded border transition-all ${
                             isAbsent
-                              ? "text-muted-foreground line-through opacity-50 cursor-not-allowed bg-secondary/50"
-                              : "bg-secondary hover:bg-secondary/80 text-foreground"
+                              ? "text-muted-foreground line-through opacity-50 cursor-not-allowed bg-secondary/50 border-border/30"
+                              : "bg-secondary hover:bg-primary/20 text-foreground border-border/50 hover:border-primary/50 cursor-pointer"
                           }`}
-                          variant="outline"
+                          title={`Cliquez pour voir projections de ${player.full_name}`}
                         >
                           {player.full_name}
-                        </Button>
+                        </button>
                       );
                     })}
                   </div>
@@ -661,25 +661,25 @@ export function MatchPredictionModal({
                 {/* Away Team Players */}
                 <div>
                   <label className="text-xs font-semibold text-muted-foreground block mb-3">
-                    JOUEURS - {game?.awayTeam}
+                    JOUEURS - {game?.awayTeam} (Cliquez pour voir les projections)
                   </label>
                   <div className="grid grid-cols-5 lg:grid-cols-7 gap-1">
                     {awayRoster.slice(0, 14).map((player) => {
                       const isAbsent = awayMissingPlayers.some((p) => p.id === player.id);
                       return (
-                        <Button
+                        <button
                           key={player.id}
-                          onClick={() => addAwayMissingPlayer(player)}
+                          onClick={() => handlePlayerClick(player, false)}
                           disabled={isAbsent}
-                          className={`h-6 text-[10px] truncate px-1 ${
+                          className={`h-6 text-[10px] truncate px-1 rounded border transition-all ${
                             isAbsent
-                              ? "text-muted-foreground line-through opacity-50 cursor-not-allowed bg-secondary/50"
-                              : "bg-secondary hover:bg-secondary/80 text-foreground"
+                              ? "text-muted-foreground line-through opacity-50 cursor-not-allowed bg-secondary/50 border-border/30"
+                              : "bg-secondary hover:bg-primary/20 text-foreground border-border/50 hover:border-primary/50 cursor-pointer"
                           }`}
-                          variant="outline"
+                          title={`Cliquez pour voir projections de ${player.full_name}`}
                         >
                           {player.full_name}
-                        </Button>
+                        </button>
                       );
                     })}
                   </div>
