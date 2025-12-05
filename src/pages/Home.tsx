@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Player } from "@/services/nbaApi";
 import { PlayerSearch } from "@/components/PlayerSearch";
 import { PlayerDashboard } from "@/components/PlayerDashboard";
@@ -12,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { MatchPredictionModal } from "@/components/MatchPredictionModal";
 
 const Home = () => {
+  const navigate = useNavigate();
   const [selectedPlayer, setSelectedPlayer] = useState<Player | undefined>();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGame, setSelectedGame] = useState<TodayGame | null>(null);
@@ -226,8 +228,8 @@ const Home = () => {
                       )}
 
                       <div className="relative space-y-4">
-                        {/* Teams and Score */}
-                        <div className="space-y-3">
+                        {/* Teams and Score - Clickable */}
+                        <div className="space-y-3 cursor-pointer transition-opacity hover:opacity-80" onClick={() => navigate(`/game/${game.gameId}`)}>
                           {/* Away Team */}
                           <div className="flex items-center justify-between gap-2">
                             <span className="font-display font-semibold text-foreground text-sm flex-1 truncate" title={game.awayTeam}>
