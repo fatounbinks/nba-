@@ -657,22 +657,34 @@ export function MatchPredictionModal({
                   <label className="text-xs font-semibold text-muted-foreground block mb-3">
                     JOUEURS - {game?.homeTeam} (Cliquez pour voir les projections)
                   </label>
-                  <div className="grid grid-cols-5 lg:grid-cols-7 gap-1">
+                  <div className="grid grid-cols-1 gap-2">
                     {homeRoster.slice(0, 14).map((player) => {
                       const isAbsent = homeMissingPlayers.some((p) => p.id === player.id);
+                      const playerProjection = fullMatchPrediction?.home_players?.find(
+                        (p) => p.player_id === player.id
+                      );
                       return (
                         <button
                           key={player.id}
                           onClick={() => handlePlayerClick(player, true)}
                           disabled={isAbsent}
-                          className={`h-6 text-[10px] truncate px-1 rounded border transition-all ${
+                          className={`p-2 rounded border transition-all text-left text-xs ${
                             isAbsent
                               ? "text-muted-foreground line-through opacity-50 cursor-not-allowed bg-secondary/50 border-border/30"
                               : "bg-secondary hover:bg-primary/20 text-foreground border-border/50 hover:border-primary/50 cursor-pointer"
                           }`}
                           title={`Cliquez pour voir projections de ${player.full_name}`}
                         >
-                          {player.full_name}
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium truncate flex-1">{player.full_name}</span>
+                            {playerProjection && (
+                              <span className="ml-2 text-[11px] text-muted-foreground whitespace-nowrap">
+                                {playerProjection.predicted_stats.PTS?.toFixed(1) || "—"}pts
+                                {playerProjection.predicted_stats.REB && ` / ${playerProjection.predicted_stats.REB.toFixed(1)}reb`}
+                                {playerProjection.predicted_stats.AST && ` / ${playerProjection.predicted_stats.AST.toFixed(1)}ast`}
+                              </span>
+                            )}
+                          </div>
                         </button>
                       );
                     })}
