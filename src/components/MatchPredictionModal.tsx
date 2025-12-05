@@ -107,6 +107,26 @@ export function MatchPredictionModal({
     enabled: open && !!homeTeamId && !!awayTeamId,
   });
 
+  const {
+    data: fullMatchPrediction,
+  } = useQuery({
+    queryKey: [
+      "full-match-prediction",
+      homeTeamId,
+      awayTeamId,
+      homeMissingPlayers.map((p) => p.id).join(","),
+      awayMissingPlayers.map((p) => p.id).join(","),
+    ],
+    queryFn: () =>
+      nbaApi.getFullMatchPredictionWithAbsents(
+        homeTeamId,
+        awayTeamId,
+        homeMissingPlayers.map((p) => p.id),
+        awayMissingPlayers.map((p) => p.id)
+      ),
+    enabled: open && !!homeTeamId && !!awayTeamId,
+  });
+
 
   const addHomeMissingPlayer = useCallback(
     (player: Player) => {
